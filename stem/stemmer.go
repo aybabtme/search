@@ -1,8 +1,8 @@
 package stem
 
-import "github.com/aybabtme/search/word"
+import "github.com/aybabtme/search/term"
 
-// Stemmer can take words and return their root.
+// Stemmer can take terms and return their root.
 type Stemmer interface {
-	Stem(word word.W) (root word.W)
+	Stem(term term.T) (root term.T)
 }

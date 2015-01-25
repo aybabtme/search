@@ -1,10 +1,10 @@
 package stopword
 
 import (
-	"github.com/aybabtme/search/word"
+	"github.com/aybabtme/search/term"
 )
 
-// Checker is something that can tell if a word is a stopword.
+// Checker is something that can tell if a term is a stopword.
 type Checker interface {
-	IsStopWord(word word.W) bool
+	IsStopWord(term term.T) bool
 }
