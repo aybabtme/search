@@ -8,9 +8,14 @@ import (
 
 // Idx is an index of terms to document.
 type Idx interface {
-	Add(term.T, document.Doc)
+	// Add the document's terms to the index.
+	Add(document.Doc)
+	// Get the set of document containing a term.
 	Get(term.T) document.Set
-	NumDocs() int
+	// TotalNumTerms is the total number of terms in the index.
+	TotalNumTerms() int
+	// TotalNumDocs is the total number of docs in the index.
+	TotalNumDocs() int
 }
 
 // TermFreq is the frequency of a term in a specific
@@ -25,7 +30,7 @@ func TermFreq(idx Idx, t term.T, d document.Doc) float64 {
 // documents of the index.
 func DocumentFreq(idx Idx, t term.T) float64 {
 	withTerm := idx.Get(t).NumDocs()
-	allDocs := idx.NumDocs()
+	allDocs := idx.TotalNumDocs()
 	return float64(withTerm) / float64(allDocs)
 }
 
@@ -33,7 +38,7 @@ func DocumentFreq(idx Idx, t term.T) float64 {
 // a term in the documents of the index, dampened by
 // log2.
 func InvDocumentFreq(idx Idx, t term.T) float64 {
-	N := float64(idx.NumDocs())
+	N := float64(idx.TotalNumDocs())
 	df := DocumentFreq(idx, t)
 	return math.Log2(N / df)
 }

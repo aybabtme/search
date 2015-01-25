@@ -14,7 +14,7 @@ func (h *HashBag) init() {
 }
 
 // Add the term to the bag.
-func (h *HashBag) Add(terms ...T) {
+func (h *HashBag) Add(terms ...T) Bag {
 	if h.bag == nil {
 		h.init()
 	}
@@ -22,6 +22,7 @@ func (h *HashBag) Add(terms ...T) {
 		h.size++
 		h.bag[t] = h.bag[t] + 1
 	}
+	return h
 }
 
 // Count is the number of occurence of the term
@@ -42,4 +43,11 @@ func (h *HashBag) NumUnique() int {
 // duplicates.
 func (h *HashBag) NumTotal() int {
 	return h.size
+}
+
+// Iter iterates over all unique terms in the bag.
+func (h *HashBag) Iter(ƒ func(T)) {
+	for t := range h.bag {
+		ƒ(t)
+	}
 }
