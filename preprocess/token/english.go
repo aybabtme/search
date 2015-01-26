@@ -8,6 +8,8 @@ import (
 	"unicode"
 )
 
+var _ Tokenizer = new(English)
+
 // English is a tokenizer for the english language.
 type English struct {
 	TermBagFactory func() term.Bag
@@ -15,7 +17,7 @@ type English struct {
 
 func (e *English) init() {
 	if e.TermBagFactory == nil {
-		e.TermBagFactory = DefaultTermBagFactory
+		e.TermBagFactory = term.DefaultBagFactory
 	}
 }
 
@@ -39,7 +41,7 @@ func (e *English) Tokenize(r io.Reader) (term.Bag, error) {
 			return false
 		})
 		for _, field := range fields {
-			terms.Add(term.T(field))
+			terms.Add(term.T(bytes.ToLower(field)))
 		}
 
 	}

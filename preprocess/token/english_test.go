@@ -14,10 +14,10 @@ Convert query to a tf-idf-weighted vector q. For each dj in D do
 Compute score sj = cosSim(dj, q)
 Sort documents by decreasing score. Present top ranked documents to the user.`
 	tokens := []string{
-		"Convert", "all", "documents", "in", "collection", "D", "to", "tf-idf", "weighted", "vectors", "dj", "for", "keyword", "vocabulary", "V",
-		"Convert", "query", "to", "a", "tf-idf-weighted", "vector", "q", "For", "each", "dj", "in", "D", "do",
-		"Compute", "score", "sj", "cosSim", "dj", "q",
-		"Sort", "documents", "by", "decreasing", "score", "Present", "top", "ranked", "documents", "to", "the", "user",
+		"convert", "all", "documents", "in", "collection", "d", "to", "tf-idf", "weighted", "vectors", "dj", "for", "keyword", "vocabulary", "v",
+		"convert", "query", "to", "a", "tf-idf-weighted", "vector", "q", "for", "each", "dj", "in", "d", "do",
+		"compute", "score", "sj", "cossim", "dj", "q",
+		"sort", "documents", "by", "decreasing", "score", "present", "top", "ranked", "documents", "to", "the", "user",
 	}
 
 	wantTerms := new(term.HashBag)

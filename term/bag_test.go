@@ -7,7 +7,7 @@ import (
 )
 
 func TestHashBag(t *testing.T) {
-	testBagImpl(t, new(term.HashBag))
+	testBagImpl(t, term.DefaultBagFactory())
 }
 
 func testBagImpl(t testing.TB, bag term.Bag) {

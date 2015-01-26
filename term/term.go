@@ -20,3 +20,6 @@ type Bag interface {
 	// Iter iterates over all unique terms in the bag.
 	Iter(func(T))
 }
+
+// DefaultBagFactory create using a HashBag implementation.
+func DefaultBagFactory() Bag { return new(HashBag) }
