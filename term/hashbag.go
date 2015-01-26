@@ -20,7 +20,7 @@ func (h *HashBag) Add(terms ...T) Bag {
 	}
 	for _, t := range terms {
 		h.size++
-		h.bag[t] = h.bag[t] + 1
+		h.bag[t]++
 	}
 	return h
 }
