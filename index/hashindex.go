@@ -40,18 +40,23 @@ func (h *HashIndex) init() {
 	}
 }
 
-// Add index the document's terms.
-func (h *HashIndex) Add(doc document.Doc) {
+// Add indexes the documents' terms.
+func (h *HashIndex) Add(docs ...document.Doc) Idx {
 	h.init()
-	doc.Terms().Iter(func(t term.T) {
-		docset, ok := h.mapping[t]
-		if !ok {
-			docset = h.DocsetFactory()
-			h.mapping[t] = docset
-		}
-		docset.Add(doc)
-	})
-	h.allDocs.Add(doc)
+	for _, doc := range docs {
+		doc.Terms().Iter(func(t term.T) {
+			docset, ok := h.mapping[t]
+			if !ok {
+				docset = h.DocsetFactory()
+				h.mapping[t] = docset
+			}
+			docset.Add(doc)
+		})
+
+	}
+	h.allDocs.Add(docs...)
+
+	return h
 }
 
 // Get the set of document containing a term.

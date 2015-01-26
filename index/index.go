@@ -8,8 +8,8 @@ import (
 
 // Idx is an index of terms to document.
 type Idx interface {
-	// Add the document's terms to the index.
-	Add(document.Doc)
+	// Add the documents' terms to the index.
+	Add(...document.Doc) Idx
 	// Get the set of document containing a term.
 	Get(term.T) document.Set
 	// TotalNumTerms is the total number of terms in the index.
@@ -19,19 +19,21 @@ type Idx interface {
 }
 
 // TermFreq is the frequency of a term in a specific
-// document of the index.
+// document of the index, compared to the total number
+// of unique terms in the document.
 func TermFreq(idx Idx, t term.T, d document.Doc) float64 {
+	l := d.Terms().NumUnique()
+	if l == 0 {
+		return 0
+	}
 	f := d.Terms().Count(t)
-	l := d.Terms().NumTotal()
 	return float64(f) / float64(l)
 }
 
 // DocumentFreq tells the frequency of a term in all the
 // documents of the index.
 func DocumentFreq(idx Idx, t term.T) float64 {
-	withTerm := idx.Get(t).NumDocs()
-	allDocs := idx.TotalNumDocs()
-	return float64(withTerm) / float64(allDocs)
+	return float64(idx.Get(t).NumDocs())
 }
 
 // InvDocumentFreq is the inverse document frequency of
@@ -40,7 +42,13 @@ func DocumentFreq(idx Idx, t term.T) float64 {
 func InvDocumentFreq(idx Idx, t term.T) float64 {
 	N := float64(idx.TotalNumDocs())
 	df := DocumentFreq(idx, t)
-	return math.Log2(N / df)
+	if df == 0.0 {
+		// if the term is never there, then its idf is
+		// +inf. This way if its only in 1 document, its
+		// importance will be infinite compared to others
+		return math.Inf(+1)
+	}
+	return math.Log(N / df)
 }
 
 // TFIDF is the score of a term given its frequency in
