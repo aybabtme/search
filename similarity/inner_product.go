@@ -4,7 +4,6 @@ import (
 	"github.com/aybabtme/search/document"
 	"github.com/aybabtme/search/query"
 	"github.com/aybabtme/search/term"
-	"log"
 )
 
 // Weighter gives a weight to a term in a document.
@@ -18,13 +17,10 @@ type Weighter func(term.T, document.Doc) float64
 // The measurement is unbounded.
 func InnerProduct(w Weighter, q query.Q, doc document.Doc) float64 {
 	var product float64
-	i := 0
-	q.Terms().Iter(func(t term.T) {
-		wij := w(t, doc)
-		wiq := w(t, q)
-		log.Printf("%d: t=%v, wij=%f, wiq=%f", i, t, wij, wiq)
-		product += wij * wiq
-		i++
+	doc.Terms().Iter(func(t term.T) {
+		wdoc := w(t, doc)
+		wq := w(t, q)
+		product += wdoc * wq
 	})
 	return product
 }
