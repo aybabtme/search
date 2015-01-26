@@ -16,6 +16,8 @@ type Idx interface {
 	TotalNumTerms() int
 	// TotalNumDocs is the total number of docs in the index.
 	TotalNumDocs() int
+	// Iter iterates over all the documents in the index.
+	Iter(func(document.Doc))
 }
 
 // TermFreq is the frequency of a term in a specific

@@ -5,6 +5,7 @@ import (
 	"github.com/aybabtme/search/index"
 	"github.com/aybabtme/search/term"
 	"math"
+	"reflect"
 	"testing"
 )
 
@@ -78,6 +79,21 @@ func testIndexImpl(t testing.TB, idx index.Idx) {
 		if want, got := len(tt.shouldHave), docset.NumDocs(); want != got {
 			t.Fatalf("want numdoc %d, got %d", want, got)
 		}
+	}
+
+	wantAll := map[int]document.Doc{
+		wantDoc.ID():    wantDoc,
+		anotherDoc.ID(): anotherDoc,
+	}
+	gotAll := map[int]document.Doc{}
+	idx.Iter(func(doc document.Doc) {
+		gotAll[doc.ID()] = doc
+	})
+
+	if !reflect.DeepEqual(wantAll, gotAll) {
+		t.Logf("want=%#v", wantAll)
+		t.Logf(" got=%#v", gotAll)
+		t.Fatalf("mismatch!")
 	}
 }
 

@@ -81,3 +81,9 @@ func (h *HashIndex) TotalNumDocs() int {
 	h.init()
 	return h.allDocs.NumDocs()
 }
+
+// Iter iterates over all the documents in the index.
+func (h *HashIndex) Iter(ƒ func(document.Doc)) {
+	h.init()
+	h.allDocs.Iter(ƒ)
+}
