@@ -69,8 +69,23 @@ func (s *Search) AddTerms(terms term.Bag) *Search {
 	return s
 }
 
-// Query the search index for an ensemble of terms.
-func (s *Search) Query(terms ...term.T) []ranking.Scoring {
+// QueryReader the search index for an ensemble of terms.
+func (s *Search) QueryReader(top int, r io.Reader) ([]ranking.Scoring, error) {
+	terms, err := s.Preprocessor.Process(r)
+	if err != nil {
+		return nil, err
+	}
+	q := query.Q(document.NewD(-1, terms))
+	result := new(ranking.Result)
+	s.Idx.Iter(func(doc document.Doc) {
+		score := similarity.Cosine(s.Weigther, q, doc)
+		result.Add(score, doc)
+	})
+	return result.Rank()[:top], nil
+}
+
+// QueryTerms the search index for an ensemble of terms.
+func (s *Search) QueryTerms(top int, terms ...term.T) []ranking.Scoring {
 	bag := s.TermBagFactory().Add(terms...)
 	q := query.Q(document.NewD(-1, bag))
 
@@ -79,5 +94,5 @@ func (s *Search) Query(terms ...term.T) []ranking.Scoring {
 		score := similarity.Cosine(s.Weigther, q, doc)
 		result.Add(score, doc)
 	})
-	return result.Ranks
+	return result.Rank()[:top]
 }

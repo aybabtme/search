@@ -16,31 +16,32 @@ type Scoring struct {
 
 // Result of a ranking.
 type Result struct {
-	Top   int
-	Ranks []Scoring
+	sorted bool
+	ranks  []Scoring
 }
 
 func (r *Result) init() {
-	if r.Top == 0 {
-		r.Top = DefaultTop
+	if r.ranks == nil {
+		r.ranks = make([]Scoring, 0, DefaultTop)
 	}
-	if r.Ranks == nil {
-		r.Ranks = make([]Scoring, 0, r.Top)
+}
+
+// Rank returns the ordered scored documents, from
+// highest score to lowest score.
+func (r *Result) Rank() []Scoring {
+	if !r.sorted {
+		sort.Sort(byScore(r.ranks))
+		r.sorted = true
 	}
+	return r.ranks
 }
 
 // Add a score/document pair if the score is high enough.
 func (r *Result) Add(score float64, doc document.Doc) {
 	r.init()
-	minScore := r.Ranks[len(r.Ranks)-1].Score
-	if score < minScore {
-		return // ignore it
-	}
-	r.Ranks = append(r.Ranks, Scoring{Score: score, Doc: doc})
-	sort.Sort(byScore(r.Ranks))
-	if len(r.Ranks) > r.Top {
-		r.Ranks = r.Ranks[:r.Top]
-	}
+	r.sorted = false
+	r.ranks = append(r.ranks, Scoring{Score: score, Doc: doc})
+	sort.Sort(byScore(r.ranks))
 }
 
 type byScore []Scoring
