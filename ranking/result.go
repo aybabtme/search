@@ -41,7 +41,6 @@ func (r *Result) Add(score float64, doc document.Doc) {
 	r.init()
 	r.sorted = false
 	r.ranks = append(r.ranks, Scoring{Score: score, Doc: doc})
-	sort.Sort(byScore(r.ranks))
 }
 
 type byScore []Scoring

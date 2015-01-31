@@ -6,6 +6,7 @@ import (
 	"flag"
 	"github.com/aybabtme/search"
 	"github.com/aybabtme/uniplot/spark"
+	"github.com/davecheney/profile"
 	"io"
 	"log"
 	"os"
@@ -28,6 +29,11 @@ func openFileOrExit(filename string) *os.File {
 }
 
 func main() {
+	p := profile.Start(&profile.Config{
+		CPUProfile: true,
+	})
+	defer p.Stop()
+
 	log.SetFlags(0)
 	corpusFilename := flag.String("corpus", "", "file containing the tweets")
 	trecFilename := flag.String("trec", "", "file containing the trec queries")
@@ -52,7 +58,6 @@ func main() {
 	if err := indexTweets(s, corpus); err != nil {
 		log.Fatalf("indexing %q: %v", corpus.Name(), err)
 	}
-
 	if err := answerQueries(s, *top, trecQueries); err != nil {
 		log.Fatalf("answering queries in %q: %v", trecQueries.Name(), err)
 	}
@@ -82,13 +87,12 @@ func answerQueries(s *search.Search, top int, trecQueries io.Reader) error {
 	topics, errc := decodeTopicQueries(trecQueries)
 
 	sparkUI := spark.Spark(time.Millisecond * 197)
-	sparkUI.Units = "topics"
+	sparkUI.Units = " topics"
 	sparkUI.Start()
 	defer sparkUI.Stop()
 
 	for t := range topics {
 		sparkUI.Add(1)
-
 		ranks, err := s.QueryReader(top, strings.NewReader(t.Title))
 		if err != nil {
 			return err
@@ -128,19 +132,18 @@ func decodeTopicQueries(r io.Reader) (<-chan Topic, <-chan error) {
 	go func() {
 		defer close(errc)
 		defer close(topics)
-
-		var err error
 		dec := xml.NewDecoder(r)
-		for err == nil {
+		for {
 			t := Topic{}
-			err = dec.Decode(&t)
+			err := dec.Decode(&t)
 			if err == nil {
 				topics <- t
+			} else if err != io.EOF {
+				errc <- err
+				return
+			} else {
+				return
 			}
-		}
-
-		if err != io.EOF {
-			errc <- err
 		}
 	}()
 
