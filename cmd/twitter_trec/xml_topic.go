@@ -38,11 +38,7 @@ func (t *Topic) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 
-	t.Number = strings.NewReplacer(
-		"Number:", "",
-		"Number :", "",
-		" ", "",
-	).Replace(v.Number)
+	t.Number = extractNumber(v.Number)
 	t.Title = strings.TrimSpace(v.Title)
 	t.QueryTime, err = time.Parse(time.RubyDate, strings.TrimSpace(v.QueryTime))
 	if err != nil {
@@ -50,4 +46,14 @@ func (t *Topic) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	}
 	t.QueryTweetTime, err = strconv.Atoi(strings.TrimSpace(v.QueryTweetTime))
 	return err
+}
+
+func extractNumber(input string) string {
+	for i, r := range input {
+		switch r {
+		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			return input[i:]
+		}
+	}
+	return input
 }

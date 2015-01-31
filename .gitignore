@@ -1,3 +1,7 @@
 cover.out
 cmd/twitter_trec/third_party/
 cmd/twitter_trec/testdata/
+Result.txt
+Trec_microblog11-qrels.txt
+twitter_trec
+trec_eval
