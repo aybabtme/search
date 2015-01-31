@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"flag"
 	"github.com/aybabtme/search"
+	"github.com/aybabtme/search/ranking"
 	"github.com/aybabtme/uniplot/spark"
 	"github.com/davecheney/profile"
 	"io"
@@ -28,6 +29,14 @@ func openFileOrExit(filename string) *os.File {
 	return f
 }
 
+func createFileOrExit(filename string) *os.File {
+	f, err := os.Create(filename)
+	if err != nil {
+		printUsage("can't create %q: %v", filename, err)
+	}
+	return f
+}
+
 func main() {
 	p := profile.Start(&profile.Config{
 		CPUProfile: true,
@@ -38,6 +47,8 @@ func main() {
 	corpusFilename := flag.String("corpus", "", "file containing the tweets")
 	trecFilename := flag.String("trec", "", "file containing the trec queries")
 	top := flag.Int("top", 1000, "return top N results")
+	outputFilename := flag.String("output", "Result.txt", "file where to write the trec results")
+	tag := flag.String("tag", "myRun", "tag to append to the end of the trec results")
 	flag.Parse()
 
 	switch {
@@ -51,6 +62,8 @@ func main() {
 	defer corpus.Close()
 	trecQueries := openFileOrExit(*trecFilename)
 	defer trecQueries.Close()
+	output := createFileOrExit(*outputFilename)
+	defer output.Close()
 
 	log.SetPrefix("twitter_trec: ")
 
@@ -58,7 +71,21 @@ func main() {
 	if err := indexTweets(s, corpus); err != nil {
 		log.Fatalf("indexing %q: %v", corpus.Name(), err)
 	}
-	if err := answerQueries(s, *top, trecQueries); err != nil {
+
+	result := log.New(output, "", 0)
+	report := func(t Topic, ranks []ranking.Scoring) {
+		for k, r := range ranks {
+			result.Printf("%s Q0 %d %d %.3f %s",
+				t.Number,
+				r.Doc.Value().(Tweet).ID,
+				k+1,
+				r.Score,
+				*tag,
+			)
+		}
+	}
+
+	if err := answerQueries(s, *top, trecQueries, report); err != nil {
 		log.Fatalf("answering queries in %q: %v", trecQueries.Name(), err)
 	}
 }
@@ -82,7 +109,7 @@ func indexTweets(s *search.Search, corpus io.Reader) error {
 	return <-errc
 }
 
-func answerQueries(s *search.Search, top int, trecQueries io.Reader) error {
+func answerQueries(s *search.Search, top int, trecQueries io.Reader, fn func(t Topic, ranks []ranking.Scoring)) error {
 	log.Printf("decoding and answering queries...")
 	topics, errc := decodeTopicQueries(trecQueries)
 
@@ -100,13 +127,7 @@ func answerQueries(s *search.Search, top int, trecQueries io.Reader) error {
 			return err
 		}
 		i++
-
-		log.Printf("query %q", t.Title)
-		for _, r := range ranks {
-			log.Printf("- %f: %q", r.Score, r.Doc.Value())
-		}
-
-		_ = ranks
+		fn(t, ranks)
 	}
 	log.Printf("answered %d queries", i)
 	return <-errc
