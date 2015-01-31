@@ -75,7 +75,7 @@ func indexTweets(s *search.Search, corpus io.Reader) error {
 	count := 0
 	for t := range tweets {
 		sparkUI.Add(1)
-		s.AddReader(t)
+		s.AddReader(strings.NewReader(t.Message), t)
 		count++
 	}
 	log.Printf("indexed %d tweets", count)
@@ -91,19 +91,29 @@ func answerQueries(s *search.Search, top int, trecQueries io.Reader) error {
 	sparkUI.Start()
 	defer sparkUI.Stop()
 
+	i := 0
 	for t := range topics {
+
 		sparkUI.Add(1)
 		ranks, err := s.QueryReader(top, strings.NewReader(t.Title))
 		if err != nil {
 			return err
 		}
+		i++
+
+		log.Printf("query %q", t.Title)
+		for _, r := range ranks {
+			log.Printf("- %f: %q", r.Score, r.Doc.Value())
+		}
+
 		_ = ranks
 	}
+	log.Printf("answered %d queries", i)
 	return <-errc
 }
 
-func decodeTweets(r io.Reader) (<-chan io.Reader, <-chan error) {
-	tweets := make(chan io.Reader)
+func decodeTweets(r io.Reader) (<-chan Tweet, <-chan error) {
+	tweets := make(chan Tweet)
 	errc := make(chan error, 1)
 
 	go func() {
@@ -114,7 +124,13 @@ func decodeTweets(r io.Reader) (<-chan io.Reader, <-chan error) {
 		scan.Split(bufio.ScanLines)
 
 		for scan.Scan() {
-			tweets <- strings.NewReader(scan.Text())
+			t := Tweet{}
+			err := t.Decode(scan.Bytes())
+			if err != nil {
+				errc <- err
+				return
+			}
+			tweets <- t
 		}
 
 		if scan.Err() != nil {

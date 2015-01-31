@@ -43,7 +43,7 @@ func (t *Topic) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		"Number :", "",
 		" ", "",
 	).Replace(v.Number)
-	t.Title = v.Title
+	t.Title = strings.TrimSpace(v.Title)
 	t.QueryTime, err = time.Parse(time.RubyDate, strings.TrimSpace(v.QueryTime))
 	if err != nil {
 		return fmt.Errorf("query time was %q: %v", v.QueryTime, err)

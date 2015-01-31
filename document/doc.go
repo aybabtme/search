@@ -10,6 +10,8 @@ type Doc interface {
 	ID() int
 	// Terms in the document.
 	Terms() term.Bag
+	// Value is the original document.
+	Value() interface{}
 }
 
 // Set of documents.

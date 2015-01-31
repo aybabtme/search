@@ -51,11 +51,11 @@ func (s *Search) init() {
 }
 
 // AddReader the content of r to the search index.
-func (s *Search) AddReader(r io.Reader) (*Search, error) {
+func (s *Search) AddReader(r io.Reader, v interface{}) (*Search, error) {
 	s.init()
 	terms, err := s.Preprocessor.Process(r)
 	if err == nil {
-		s.Idx.Add(document.NewD(s.id, terms))
+		s.Idx.Add(document.NewD(s.id, terms, v))
 		s.id++
 	}
 	return s, err
@@ -63,8 +63,8 @@ func (s *Search) AddReader(r io.Reader) (*Search, error) {
 
 // AddTerms puts the terms in a document of the search
 // index.
-func (s *Search) AddTerms(terms term.Bag) *Search {
-	s.Idx.Add(document.NewD(s.id, terms))
+func (s *Search) AddTerms(terms term.Bag, v interface{}) *Search {
+	s.Idx.Add(document.NewD(s.id, terms, v))
 	s.id++
 	return s
 }
@@ -75,7 +75,7 @@ func (s *Search) QueryReader(top int, r io.Reader) ([]ranking.Scoring, error) {
 	if err != nil {
 		return nil, err
 	}
-	q := query.Q(document.NewD(-1, terms))
+	q := query.Q(document.NewD(-1, terms, nil))
 	result := new(ranking.Result)
 	s.Idx.Iter(func(doc document.Doc) {
 		score := similarity.Cosine(s.Weigther, q, doc)
@@ -87,7 +87,7 @@ func (s *Search) QueryReader(top int, r io.Reader) ([]ranking.Scoring, error) {
 // QueryTerms the search index for an ensemble of terms.
 func (s *Search) QueryTerms(top int, terms ...term.T) []ranking.Scoring {
 	bag := s.TermBagFactory().Add(terms...)
-	q := query.Q(document.NewD(-1, bag))
+	q := query.Q(document.NewD(-1, bag, nil))
 
 	result := new(ranking.Result)
 	s.Idx.Iter(func(doc document.Doc) {
