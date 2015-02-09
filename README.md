@@ -1,10 +1,12 @@
 # asg 1
 
-* Antoine Grondin, 6276497: implemented the `document`/`index`/`query`/`ranking`/`similarity`/`term`
+* Antoine Grondin, 6276497:
+    * implemented the `document`/`index`/`query`/`ranking`/`similarity`/`term`
 packages.
-* Raj Pathak, 5650066: implemented the `preprocess` package. Integrated the `bleve`-based library.
-
-      * a detailed note about the functionality of your programs
+* Raj Pathak, 5650066:
+    * implemented the `preprocess` package.
+    * integrated the `bleve`-based library.
+    * wrote this document.
 
 ## Functionality
 
@@ -12,7 +14,6 @@ We have two implementations of the IR system.
 
 * A completely fresh implementation, in the subpackages.
 * An implementation using off-the-shelf software, using the `bleve` search engine.
-
 
 ## Algorithms, data structures and optimizations:
 
@@ -784,9 +785,4 @@ P1000           all 0.0457
 * `creator-destructor`
 * `2987oc5`
 
-
-- include the file named Results with the results for all the 49 test queries, in the required format.
-- make sure all your programs run correctly.
-- submit your assignment, including programs, README file, and Results file, as a zip file through Blackboard Learn.
-- don’t include the initial text collection or any external tools.
 
