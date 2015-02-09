@@ -18,6 +18,11 @@ type Idx interface {
 	TotalNumDocs() int
 	// Iter iterates over all the documents in the index.
 	Iter(func(document.Doc))
+
+	TermFreq(t term.T, d document.Doc) float64
+	DocumentFreq(t term.T) float64
+	InvDocumentFreq(t term.T) float64
+	TFIDF(t term.T, d document.Doc) float64
 }
 
 // TermFreq is the frequency of a term in a specific

@@ -43,7 +43,7 @@ func (e *English) Process(r io.Reader) (term.Bag, error) {
 		if e.Checker.IsStopWord(t) {
 			return // ignore
 		}
-		processed.Add(e.Stemmer.Stem(t))
+		processed.Add(e.Stemmer.Stem(t)) // but insert the stem
 	})
 	return processed, err
 }

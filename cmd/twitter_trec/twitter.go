@@ -5,6 +5,8 @@ import (
 	"encoding/xml"
 	"flag"
 	"github.com/aybabtme/search"
+	"github.com/aybabtme/search/preprocess"
+	"github.com/aybabtme/search/preprocess/token"
 	"github.com/aybabtme/search/ranking"
 	"github.com/aybabtme/uniplot/spark"
 	"github.com/davecheney/profile"
@@ -68,9 +70,21 @@ func main() {
 	log.SetPrefix("twitter_trec: ")
 
 	s := new(search.Search)
+	s.Preprocessor = &preprocess.English{
+		Tokenizer: &token.English{
+			TermBooster: func(t []byte) ([]byte, int) {
+				if t[0] == '#' {
+					return t[1:], 5
+				}
+				return t, 1
+			},
+		},
+	}
+
 	if err := indexTweets(s, corpus); err != nil {
 		log.Fatalf("indexing %q: %v", corpus.Name(), err)
 	}
+	log.Printf("%d terms indexed", s.Idx.TotalNumTerms())
 
 	result := log.New(output, "", 0)
 	report := func(t Topic, ranks []ranking.Scoring) {

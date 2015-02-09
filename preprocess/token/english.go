@@ -10,12 +10,18 @@ import (
 
 var _ Tokenizer = new(English)
 
+var DefaultBooster = func(t []byte) ([]byte, int) { return t, 1 }
+
 // English is a tokenizer for the english language.
 type English struct {
+	TermBooster    func([]byte) ([]byte, int)
 	TermBagFactory func() term.Bag
 }
 
 func (e *English) init() {
+	if e.TermBooster == nil {
+		e.TermBooster = DefaultBooster
+	}
 	if e.TermBagFactory == nil {
 		e.TermBagFactory = term.DefaultBagFactory
 	}
@@ -32,6 +38,9 @@ func (e *English) Tokenize(r io.Reader) (term.Bag, error) {
 			if r == '-' {
 				return false
 			}
+			if r == '#' {
+				return false
+			}
 			if unicode.IsSymbol(r) {
 				return true
 			}
@@ -41,7 +50,11 @@ func (e *English) Tokenize(r io.Reader) (term.Bag, error) {
 			return false
 		})
 		for _, field := range fields {
-			terms.Add(term.T(bytes.ToLower(field)))
+			asT, count := e.TermBooster(field)
+			t := term.T(bytes.ToLower(asT))
+			for i := 0; i < count; i++ {
+				terms.Add(t)
+			}
 		}
 
 	}
