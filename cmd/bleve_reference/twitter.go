@@ -47,7 +47,7 @@ func main() {
 	trecFilename := flag.String("trec", "", "file containing the trec queries")
 	top := flag.Int("top", 1000, "return top N results")
 	outputFilename := flag.String("output", "Result.txt", "file where to write the trec results")
-	tag := flag.String("tag", "bleveRun", "tag to append to the end of the trec results")
+	tag := flag.String("tag", "antoineRun", "tag to append to the end of the trec results")
 	flag.Parse()
 
 	switch {
