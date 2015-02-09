@@ -5,3 +5,4 @@ Result.txt
 Trec_microblog11-qrels.txt
 twitter_trec
 trec_eval
+third_party/

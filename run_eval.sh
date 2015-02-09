@@ -7,7 +7,7 @@ GOPATH="$HOME/gocode/"
 
 TWITTER_PATH="cmd/twitter_trec"
 BLEVE_PATH="cmd/bleve_reference"
-TESTDATA_PATH="$TWITTER_PATH/testdata"
+TESTDATA_PATH="third_party/testdata"
 
 OWN_COMMAND="go run $TWITTER_PATH/tweet.go $TWITTER_PATH/twitter.go $TWITTER_PATH/xml_topic.go"
 BLEVE_COMMAND="go run $BLEVE_PATH/tweet.go $BLEVE_PATH/twitter.go $BLEVE_PATH/xml_topic.go"
