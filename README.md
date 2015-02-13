@@ -125,6 +125,25 @@ P500            all 0.0781
 P1000           all 0.0457
 ```
 
+Our recall and precision numbers, based off the data, were the following:
+
+```
+recall = 2238 / 2640 = 0.8477
+precision = 2238 / 39387 = 0.05682
+```
+
+![document-level-vs-precision-image][document]
+![recall-level-vs-rank-image][recall]
+
+Here we can directly observe the phenomenon of the trade-off between recall and precision, as discussed in class. Looking at both the incremental recall level and document number level precision averages, we can see this taking place as the precision drops very dramtically upon approaching full recall.
+
+Based on the R precision, we can see that most of the relevant documents are not actually among the first recalled, probably due to the overall very high recall value.
+
+However, looking at the average precision values, we see the system has a 20-27% rating per query, leaving it overall to be satisfactory.
+
+[document]: https://cloud.githubusercontent.com/assets/1189716/6180746/3651e782-b2f7-11e4-8118-7f4b6a7cf7eb.jpg "Document Level vs Precision"
+[recall]: https://cloud.githubusercontent.com/assets/1189716/6180749/38481336-b2f7-11e4-9133-60b9f7d87654.jpg "Recall Level vs Precision"
+
 ### How big was the vocabulary?
 
 86764 terms in 45899 tweets.
